@@ -26,7 +26,7 @@ export default function MainPage({ children }) {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav activeKey="/book" className="me-auto">
-              <Nav.Link href="/book">Libro</Nav.Link>
+              <Nav.Link>Libro</Nav.Link>
             </Nav>
             <Form className='d-flex'>
               <FormControl placeholder='Url de la API' className="me-2" onChange={e => setUrlapi(e.target.value)}></FormControl>
