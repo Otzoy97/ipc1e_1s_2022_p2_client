@@ -1,4 +1,3 @@
-import axios from "axios"
 import { createContext, useContext, useState } from "react"
 
 const urlContext = createContext();
@@ -13,10 +12,22 @@ export const useUrl = () => {
 }
 
 export const useProvideUrl = () => {
-  const [urlApi, setUrlApi] = useState("")
+  let storage = ""
+  if (localStorage.getItem("urlApi")) {
+    storage = localStorage.getItem("urlApi")
+  } else {
+    localStorage.setItem("urlApi", "")
+  }
+
+  const [url, setUrl] = useState(storage)
+
+  const setApiUrl = (url) => {
+    setUrl(url)
+    localStorage.setItem("urlApi", url)
+  }
 
   return {
-    urlApi,
-    setUrlApi
+    url,
+    setApiUrl,
   }
 }

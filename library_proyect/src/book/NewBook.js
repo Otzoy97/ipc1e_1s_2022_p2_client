@@ -1,86 +1,46 @@
 import React, { useState } from 'react'
-import Form from 'react-bootstrap/Form'
+import FormControl from 'react-bootstrap/FormControl'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import axios from 'axios'
+import { useUrl } from '../hooks/useUrl'
 
 export default function NewBook() {
+  const url = useUrl();
+  const [file, setFile] = useState();
 
-  const [show, setShow] = useState(false)
-  const [isbn, setIsbn] = useState(0)
-  const [author, setAuthor] = useState('')
-  const [title, setTitle] = useState('')
-  const [edition, setEdition] = useState(0)
-  const [year, setYear] = useState(0)
-  const [no_copies, setNoCopies] = useState(0)
-  const [no_available_copies, setNoAvailableCopies] = useState(0)
-  const [no_bookshelf, setNoBookshelf] = useState(0)
-  const [no_bookshelf_row, setBookshelfRow] = useState(0)
-
-
-  const handleClose = () => setShow(false)
-  const handleShow = () => setShow(true);
-
-  const handleSubmit = () => {
-    console.log({ isbn });
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const read = new FileReader()
+    read.onload = async (e) => {
+      const parseJSON = JSON.parse(e.target.result)
+      parseJSON.forEach(element => {
+        axios.post(url.url + '/book', element).then((value) => {
+          if (value.status === 201) {
+            alert(value.data.msg)
+          }
+        }).catch((e) => {
+          alert(e.response.data.msg)
+        });
+      });
+    }
+    read.readAsText(file[0])
   }
 
   return (
-    <>
-      <Button variante="success" onClick={handleShow}>
-        Nuevo libro
-      </Button>
-      <Modal show={show} size="lg" onHide={handleClose}>
-        <Modal.Header closeButton>Crear nuevo libro</Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Row className="mb-2">
-              <Col>
-                <Form.Control required type="number" placeholder="isbn" onChange={e => setIsbn(parseInt(e.target.value))}></Form.Control>
-              </Col>
-            </Row>
-            <Row className="mb-2">
-              <Col>
-                <Form.Control required type="text" placeholder="título" onChange={e => setTitle(e.target.value)}></Form.Control>
-              </Col>
-              <Col>
-                <Form.Control required type="text" placeholder="autor" onChange={e => setAuthor(e.target.value)}></Form.Control>
-              </Col>
-              <Col>
-                <Form.Control required type="number" placeholder="edición" onChange={e => setEdition(parseInt(e.target.value))}></Form.Control>
-              </Col>
-              <Col>
-                <Form.Control required type="number" placeholder="año" onChange={e => setYear(parseInt(e.target.value))}></Form.Control>
-              </Col>
-            </Row>
-            <Row className="mb-2">
-              <Col>
-                <Form.Control required type="number" placeholder="cantidad de copias" onChange={e => setNoCopies(parseInt(e.target.value))}></Form.Control>
-              </Col>
-              <Col>
-                <Form.Control required type="number" placeholder="cantidad de copias disponibles" onChange={e => setNoAvailableCopies(parseInt(e.target.value))}></Form.Control>
-              </Col>
-            </Row>
-            <Row className="mb-2">
-              <Col>
-                <Form.Control required type="number" placeholder="no. de estantería" onChange={e => setNoBookshelf(parseInt(e.target.value))}></Form.Control>
-              </Col>
-              <Col>
-                <Form.Control required type="number" placeholder="no. de fila en estantería" onChange={e => setBookshelfRow(parseInt(e.target.value))}></Form.Control>
-              </Col>
-            </Row>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" type="submit" onClick={handleSubmit}>
-            Crear libro
+    <Row>
+      <Col sm={9} md={9}>
+        <FormControl type="file" onChange={e => setFile(e.target.files)}></FormControl>
+      </Col>
+      <Col sm={3} md={3}>
+        <div className='d-grid gap-2'>
+          <Button variante="success" onClick={handleSubmit}>
+            leer y cargar
           </Button>
-          <Button variant="secondary" type="button" onClick={handleClose}>
-            Cancelar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+        </div>
+      </Col>
+    </Row>
   )
 }

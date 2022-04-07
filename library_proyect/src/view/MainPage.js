@@ -1,12 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import FormControl from 'react-bootstrap/FormControl'
+import { useUrl } from '../hooks/useUrl'
 
 export default function MainPage({ children }) {
+  const url = useUrl()
+  const [urlapi, setUrlapi] = useState('')
+
+  const handleClick = (e) => {
+    e.preventDefault()
+    if(urlapi) {
+      url.setApiUrl(urlapi)
+    }
+  }
+
   return (
     <>
       <Navbar bg="primary" variant="dark" expand="lg" className='mb-2'>
@@ -18,13 +29,14 @@ export default function MainPage({ children }) {
               <Nav.Link href="/book">Libro</Nav.Link>
             </Nav>
             <Form className='d-flex'>
-              <FormControl placeholder='Url de la API' className="me-2"></FormControl>
-              <Button variant="outline-light">Establecer</Button>
+              <FormControl placeholder='Url de la API' className="me-2" onChange={e => setUrlapi(e.target.value)}></FormControl>
+              <Button variant="outline-light" onClick={handleClick}>Establecer</Button>
             </Form>
           </Navbar.Collapse>
         </Container>
       </Navbar>
       <Container>
+        <p>{url.url ? `usando ${url.url}`: "API indefinida"}</p>
         {children}
       </Container>
     </>
