@@ -1,21 +1,16 @@
+import NewBook from "./book/NewBook";
+import TableBook from "./book/TableBook";
+import { ProvideUrl } from "./hooks/useUrl";
+import MainPage from "./view/MainPage";
+
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ProvideUrl>
+      <MainPage>
+        <NewBook></NewBook>
+        <TableBook></TableBook>
+      </MainPage>
+    </ProvideUrl>
   );
 }
 
