@@ -13,3 +13,10 @@ export interface IEditBook {
   title?: string,
   year?: number,
 }
+
+export interface ISearchBook {
+  author?: string,
+  title?: string,
+  year_from?: number,
+  year_to?: number
+}
