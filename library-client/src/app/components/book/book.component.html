@@ -1,0 +1,173 @@
+<p-toast></p-toast>
+<div class="mt-3">
+  <p-toolbar styleClass="mb-3">
+    <ng-template pTemplate="left">
+      <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success p-mr-2"
+        (click)="showNewBookDialog()"></button>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <p-fileUpload mode="basic" #fileUpload [customUpload]="true" accept="application/json" label="Cargar (.json)"
+        chooseLabel="Seleccionar (.json)" class="p-mr-2 p-d-inline-block"></p-fileUpload>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table responsiveLayout="scroll" #dt [value]="books" [rows]="15" [paginator]="true" [rowHover]="true" dataKey="isbn"
+    currentPageReportTemplate="Se muestran {first} a {last}, de {totalRecords} elementos"
+    [showCurrentPageReport]="true">
+    <ng-template pTemplate="caption" class="m-0 p-0">
+      <div class="flex justify-content-between">
+        <p class="p-m-0 font-bold text-lg">Buscar libros</p>
+        <div class="flex justify-content-end">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="titulo">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="autor">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="año inicial">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="año final">
+          <button pButton type="button" [loading]="isLoading" class="p-button-sm" icon="pi pi-search"></button>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="isbn">
+          ISBN
+          <p-sortIcon field="isbn"></p-sortIcon>
+        </th>
+        <th pSortableColumn="author">
+          Autor
+          <p-sortIcon field="author"></p-sortIcon>
+        </th>
+        <th pSortableColumn="title">
+          Título
+          <p-sortIcon field="title"></p-sortIcon>
+        </th>
+        <th pSortableColumn="year">
+          Año
+          <p-sortIcon field="year"></p-sortIcon>
+        </th>
+        <th>Copias</th>
+        <th>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-book>
+      <tr>
+        <td>{{book.isbn}}</td>
+        <td>{{book.author}}</td>
+        <td>{{book.title}}</td>
+        <td>{{book.year}}</td>
+        <td>{{book.no_available_copies}} de {{book.no_copies}}</td>
+        <td><button pButton pRipple label="Editar" class="p-button-sm p-button-rounded p-button-warning"
+            icon="pi pi-pencil"></button></td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="newBookDialog" [style]="{width: '80%', height: 'auto'}" header="Crear libro" [modal]="true">
+    <ng-template pTemplate="content">
+      <div class="p-fluid grid mt-3">
+        <div class="p-field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtIsbn" [useGrouping]="false" [(ngModel)]="newBook.isbn"></p-inputNumber>
+            <label for="txtIsbn">ISBN</label>
+            <small class="p-invalid" *ngIf="submitted && !newBook.isbn">El ISBN es obligatorio</small>
+          </span>
+        </div>
+        <div class="field col">
+          <span class="p-float-label">
+            <input type="text" id="txtAuthor" pInputText [(ngModel)]="newBook.author" />
+            <label for="txtAuthor">Autor</label>
+            <small class="p-invalid" *ngIf="submitted && !newBook.author && !newBook.author?.trim()?.length">El Autor es
+              obligatorio</small>
+          </span>
+        </div>
+        <div class="field col">
+          <span class="p-float-label">
+            <input type="text" id="txtTitle" pInputText [(ngModel)]="newBook.title" />
+            <label for="txtTitle">Título</label>
+            <small class="p-invalid" *ngIf="submitted && !newBook.title && !newBook.title?.trim()?.length">El Título es
+              obligatorio</small>
+          </span>
+        </div>
+      </div>
+      <div class="p-fluid grid">
+        <div class="field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtYear" [min]="1" [max]="2022" [(ngModel)]="newBook.year"></p-inputNumber>
+            <label for="txtYear">Año</label>
+            <small class="p-invalid" *ngIf="submitted && !newBook.year">El Año es obligatorio</small>
+          </span>
+        </div>
+        <div class="field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtNoCopies" [min]="1" [(ngModel)]="newBook.no_copies"></p-inputNumber>
+            <label for="txtNoCopies">Copias</label>
+            <small class="p-invalid" *ngIf="submitted && !newBook.no_copies">Las copias son obligatorio</small>
+          </span>
+        </div>
+        <div class="field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtNoAvailabelCopies" [min]="1" [(ngModel)]="newBook.no_available_copies">
+            </p-inputNumber>
+            <label for="txtNoAvailabelCopies">Copias disponibles</label>
+            <small class="p-invalid" *ngIf="submitted && !newBook.no_available_copies">Las copias disponibles son
+              obligatorio</small>
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()">
+      </button>
+      <button pButton pRipple label="Crear" icon="pi pi-check" class="p-button-text" (click)="createBook()">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="editBookDialog" [style]="{width: '50%', height: 'auto'}" header="Editar libro" [modal]="true">
+    <ng-template pTemplate="content">
+      <div class="p-fluid grid mt-3">
+        <div class="p-field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtIsbn_edit" [disabled]="true" [useGrouping]="false" [(ngModel)]="editBook.isbn">
+            </p-inputNumber>
+            <label for="txtIsbn_edit">ISBN</label>
+          </span>
+        </div>
+      </div>
+      <div class="p-fluid grid">
+        <div class="p-field col">
+          <span class="p-float-label">
+            <input type="text" id="txtAuthor_edit" pInputText [(ngModel)]="editBook.author" />
+            <label for="txtAuthor_edit">Autor</label>
+            <small class="p-invalid" *ngIf="submitted && !editBook.author && !editBook.author?.trim()?.length">El Autor es
+              obligatorio</small>
+          </span>
+        </div>
+        <div class="p-field col">
+          <span class="p-float-label">
+            <input type="text" id="txtTitle_edit" pInputText [(ngModel)]="editBook.title" />
+            <label for="txtTitle_edit">Título</label>
+            <small class="p-invalid" *ngIf="submitted && !editBook.title && !editBook.title?.trim()?.length">El Título es
+              obligatorio</small>
+          </span>
+        </div>
+        <div class="p-field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtYear_edit" [min]="1" [max]="2022" [(ngModel)]="editBook.year"></p-inputNumber>
+            <label for="txtYear_edit">Año</label>
+            <small class="p-invalid" *ngIf="submitted && !editBook.year">El Año es obligatorio</small>
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()">
+      </button>
+      <button pButton pRipple label="Editar" icon="pi pi-check" class="p-button-text" (click)="modifyBook()">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+</div>
