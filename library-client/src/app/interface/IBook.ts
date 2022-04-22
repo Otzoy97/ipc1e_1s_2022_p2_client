@@ -18,5 +18,5 @@ export interface ISearchBook {
   author?: string,
   title?: string,
   year_from?: number,
-  year_to?: number
+  year_to?: number,
 }

@@ -1,4 +1,3 @@
-<p-toast></p-toast>
 <div class="mt-3">
   <p-toolbar styleClass="mb-3">
     <ng-template pTemplate="left">
@@ -7,7 +6,9 @@
     </ng-template>
     <ng-template pTemplate="right">
       <p-fileUpload mode="basic" #fileUpload [customUpload]="true" accept="application/json" label="Cargar (.json)"
-        chooseLabel="Seleccionar (.json)" class="p-mr-2 p-d-inline-block"></p-fileUpload>
+        chooseLabel="Seleccionar (.json)" class="p-mr-2 p-d-inline-block"
+        (uploadHandler)="handleSubmit($event,fileUpload)"
+        ></p-fileUpload>
     </ng-template>
   </p-toolbar>
 
@@ -18,11 +19,11 @@
       <div class="flex justify-content-between">
         <p class="p-m-0 font-bold text-lg">Buscar libros</p>
         <div class="flex justify-content-end">
-          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="titulo">
-          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="autor">
-          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="año inicial">
-          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="año final">
-          <button pButton type="button" [loading]="isLoading" class="p-button-sm" icon="pi pi-search"></button>
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="titulo" [(ngModel)]="searchBook.title">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="autor" [(ngModel)]="searchBook.author">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="año inicial" [(ngModel)]="searchBook.year_from">
+          <input pInputText type="text" class="p-inputtext-sm m-1" placeholder="año final" [(ngModel)]="searchBook.year_to">
+          <button pButton pRipple [loading]="isLoading" icon="pi pi-search" (click)="findBook()"></button>
         </div>
       </div>
     </ng-template>
@@ -57,7 +58,7 @@
         <td>{{book.year}}</td>
         <td>{{book.no_available_copies}} de {{book.no_copies}}</td>
         <td><button pButton pRipple label="Editar" class="p-button-sm p-button-rounded p-button-warning"
-            icon="pi pi-pencil"></button></td>
+            icon="pi pi-pencil" (click)="showEditBookDialog(book)"></button></td>
       </tr>
     </ng-template>
   </p-table>
@@ -127,7 +128,7 @@
   <p-dialog [(visible)]="editBookDialog" [style]="{width: '50%', height: 'auto'}" header="Editar libro" [modal]="true">
     <ng-template pTemplate="content">
       <div class="p-fluid grid mt-3">
-        <div class="p-field col">
+        <div class="field col">
           <span class="p-float-label">
             <p-inputNumber id="txtIsbn_edit" [disabled]="true" [useGrouping]="false" [(ngModel)]="editBook.isbn">
             </p-inputNumber>
@@ -136,7 +137,7 @@
         </div>
       </div>
       <div class="p-fluid grid">
-        <div class="p-field col">
+        <div class="field col">
           <span class="p-float-label">
             <input type="text" id="txtAuthor_edit" pInputText [(ngModel)]="editBook.author" />
             <label for="txtAuthor_edit">Autor</label>
@@ -144,7 +145,7 @@
               obligatorio</small>
           </span>
         </div>
-        <div class="p-field col">
+        <div class="field col">
           <span class="p-float-label">
             <input type="text" id="txtTitle_edit" pInputText [(ngModel)]="editBook.title" />
             <label for="txtTitle_edit">Título</label>
@@ -152,7 +153,7 @@
               obligatorio</small>
           </span>
         </div>
-        <div class="p-field col">
+        <div class="field col">
           <span class="p-float-label">
             <p-inputNumber id="txtYear_edit" [min]="1" [max]="2022" [(ngModel)]="editBook.year"></p-inputNumber>
             <label for="txtYear_edit">Año</label>

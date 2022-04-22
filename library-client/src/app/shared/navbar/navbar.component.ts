@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
+import { getURL, isURL, setURL } from 'src/app/services/url';
 
 @Component({
   selector: 'app-navbar',
@@ -7,9 +8,10 @@ import { MenuItem } from 'primeng/api';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor() { }
+  constructor(private msgSvc: MessageService) { }
 
   items : MenuItem[];
+  url: any;
 
   ngOnInit(): void {
     this.items = [
@@ -29,5 +31,26 @@ export class NavbarComponent implements OnInit {
         routerLink: ['/lend']
       }
     ]
+    if(isURL()) {
+      this.url = getURL();
+    }
+  }
+
+  setApiUrl() : void {
+    let regexMatch = /^(?:(?:https?):\/\/)[^]+/is;
+    if (regexMatch.test(this.url)) {
+      setURL(this.url);
+      this.msgSvc.add({
+        severity: 'info',
+        summary: 'URL establecida',
+        detail: this.url
+      })
+    } else {
+      this.msgSvc.add({
+        severity: 'error',
+        summary: 'URL no válida',
+        detail: this.url
+      })
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { IBook, IEditBook, ISearchBook } from '../interface/IBook';
 import { getURL } from './url';
 
@@ -9,12 +9,12 @@ import { getURL } from './url';
 })
 export class BookService {
   constructor(private http: HttpClient) { }
-  
-  createBook(book: IBook): Observable<{ msg: string }> {
-    return this.http.post<{ msg: string }>(`${getURL()}/book`, book)
+
+  createBook(book: IBook): Observable<HttpResponse<{ msg: string }>> {
+    return this.http.post<{ msg: string }>(`${getURL()}/book`, book, { observe: 'response' })
   }
 
-  findBook(parameters: ISearchBook): Observable<IBook[]> {
+  findBook(parameters: ISearchBook): Observable<HttpResponse<IBook[]>> {
     let params = new HttpParams();
     if (parameters.author) {
       params = params.append('author', parameters.author)
@@ -28,10 +28,10 @@ export class BookService {
     if (parameters.year_to) {
       params = params.append('year_to', parameters.year_to)
     }
-    return this.http.get<IBook[]>(`${getURL()}/book`, { params: params })
+    return this.http.get<IBook[]>(`${getURL()}/book`, { params: params, observe: 'response' })
   }
 
-  modifyBook(book:IEditBook): Observable<{msg: string}> {
-    return this.http.put<{msg: string}>(`${getURL()}/book`, book);
+  modifyBook(book: IEditBook): Observable<HttpResponse<{ msg: string }>> {
+    return this.http.put<{ msg: string }>(`${getURL()}/book`, book, { observe: 'response' });
   }
 }

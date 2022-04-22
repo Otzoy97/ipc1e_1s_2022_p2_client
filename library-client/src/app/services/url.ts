@@ -2,7 +2,7 @@
  * Recupera la url almacenada en localStorage
  */
 export function getURL() {
-  return localStorage.getItem('given_url');
+  return localStorage.getItem('urlApi');
 }
 
 /**
@@ -10,7 +10,7 @@ export function getURL() {
  * @returns 
  */
 export function isURL() {
-  let info = localStorage.getItem('given_url');
+  let info = localStorage.getItem('urlApi');
   if (info) {
     return true;
   } else {
@@ -23,5 +23,5 @@ export function isURL() {
  * @param url 
  */
 export function setURL(url:string) {
-  localStorage.setItem("given_url", url);
+  localStorage.setItem("urlApi", url.trim());
 }
