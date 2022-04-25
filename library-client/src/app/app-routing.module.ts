@@ -15,10 +15,6 @@ const routes: Routes = [
     component: BookComponent
   },
   {
-    path: 'person',
-    component: PersonComponent
-  },
-  {
     path: 'lend',
     component: LendComponent
   }

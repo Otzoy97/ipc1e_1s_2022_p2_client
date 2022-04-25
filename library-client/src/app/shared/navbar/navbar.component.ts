@@ -21,11 +21,6 @@ export class NavbarComponent implements OnInit {
         routerLink: ['/book']
       },
       {
-        label: 'Personas',
-        icon: 'pi pi-user',
-        routerLink: ['/person']
-      },
-      {
         label: 'Préstamos',
         icon: 'pi pi-check',
         routerLink: ['/lend']

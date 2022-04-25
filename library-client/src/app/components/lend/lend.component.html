@@ -1,1 +1,145 @@
-<p>lend works!</p>
+<div class="mt-3">
+  <p-toolbar styleClass="mb-3">
+    <ng-template pTemplate="left">
+      <button pButton pRipple label="Nueva persona" icon="pi pi-user-plus" class="p-button-success mr-2 "
+        (click)="showNewPersonDialog()"></button>
+      <button pButton pRipple label="Prestar" icon="pi pi-arrow-circle-up" class="p-button-primary mr-2"
+        (click)="showNewLendDialog()"></button>
+      <button pButton pRipple label="Devolver" icon="pi pi-arrow-circle-down" class="p-button-secondary mr-2"
+        (click)="showNewReturnDialog()"></button>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <p-fileUpload mode="basic" #fileUpload [customUpload]="true" accept="application/json" label="Cargar (.json)"
+        chooseLabel="Seleccionar (.json)" class="p-mr-2 p-d-inline-block"
+        (uploadHandler)="handleSubmit($event,fileUpload)"></p-fileUpload>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table responsiveLayout="scroll" #dt [value]="lendList" [rows]="10" [paginator]="true" [rowHover]="true"
+    dataKey="isbn" currentPageReportTemplate="Se muestran {first} a {last}, de {totalRecords} elementos"
+    [showCurrentPageReport]="true">
+    <ng-template pTemplate="caption" class="m-0 p-0">
+      <div class="flex justify-content-between">
+        <p class="p-m-0 font-bold text-lg">Préstamos</p>
+        <div *ngIf="readPerson" class="flex justify-content-end">
+          <input pInputText type="text" readonly class="p-inputtext-sm m-1" placeholder="CUI"
+            [(ngModel)]="cuiPersonToFind">
+          <button pButton pRipple [loading]="isLoading" icon="pi pi-search" (click)="findPerson()"></button>
+          <input pInputText type="text" readonly class="p-inputtext-sm m-1" placeholder="Nombre"
+            [(ngModel)]="readPerson.first_name">
+          <input pInputText type="text" readonly class="p-inputtext-sm m-1" placeholder="Apellido"
+            [(ngModel)]="readPerson.last_name">
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>UUID</th>
+        <th>ISBN</th>
+        <th>Título</th>
+        <th>Prestado el</th>
+        <th>Devuelto el</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-lend>
+      <tr>
+        <td>{{lend.uuid}}</td>
+        <td>{{lend.isbn}}</td>
+        <td>{{lend.title}}</td>
+        <td>{{lend.lend_date}}</td>
+        <td>{{lend.return_date}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="newPersonDialog" [style]="{width: '80%', height: 'auto'}" header="Crear persona" [modal]="true">
+    <ng-template pTemplate="content">
+      <div class="p-fluid grid mt-3">
+        <div class="p-field col">
+          <span class="p-float-label">
+            <input type="text" id="txtAuthor" pInputText [(ngModel)]="newPerson.cui" />
+            <label for="txtAuthor">CUI</label>
+            <small class="p-invalid" *ngIf="submitted && !newPerson.cui && !newPerson.cui?.trim()?.length">El CUI es
+              obligatorio</small>
+          </span>
+        </div>
+        <div class="field col">
+          <span class="p-float-label">
+            <input type="text" id="txtAuthor" pInputText [(ngModel)]="newPerson.first_name" />
+            <label for="txtAuthor">Nombre</label>
+            <small class="p-invalid"
+              *ngIf="submitted && !newPerson.first_name && !newPerson.first_name?.trim()?.length">El nombre es
+              obligatorio</small>
+          </span>
+        </div>
+        <div class="field col">
+          <span class="p-float-label">
+            <input type="text" id="txtTitle" pInputText [(ngModel)]="newPerson.last_name" />
+            <label for="txtTitle">Apellido</label>
+            <small class="p-invalid"
+              *ngIf="submitted && !newPerson.last_name && !newPerson.last_name?.trim()?.length">El apellido es
+              obligatorio</small>
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()">
+      </button>
+      <button pButton pRipple label="Crear" icon="pi pi-check" class="p-button-text" (click)="createPerson()">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="newLendDialog" [style]="{width: '50%', height: 'auto'}" header="Prestar libro" [modal]="true">
+    <ng-template pTemplate="content">
+      <div class="p-fluid grid mt-3">
+        <div class="field col">
+          <span class="p-float-label">
+            <input type="text" id="txtCuiLend" pInputText [(ngModel)]="newLend.cui" />
+            <label for="txtCuiLend">CUI</label>
+            <small class="p-invalid" *ngIf="submitted && !newLend.cui && !newLend.cui?.trim()?.length">El CUI
+              es obligatorio</small>
+          </span>
+        </div>
+      </div>
+      <div class="p-fluid grid">
+        <div class="field col">
+          <span class="p-float-label">
+            <p-inputNumber id="txtIsbnLend" [useGrouping]="false" [(ngModel)]="newLend.isbn"></p-inputNumber>
+            <label for="txtIsbnLend">ISBN</label>
+            <small class="p-invalid" *ngIf="submitted && !newLend.isbn">El ISBN es obligatorio</small>
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()">
+      </button>
+      <button pButton pRipple label="Prestar" icon="pi pi-check" class="p-button-text" (click)="lendBook()">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="newReturnDialog" [style]="{width: '50%', height: 'auto'}" header="Regresar libro" [modal]="true">
+    <ng-template pTemplate="content">
+      <div class="p-fluid grid mt-3">
+        <div class="field col">
+          <span class="p-float-label">
+            <input type="text" id="txtUuidReturn" pInputText [(ngModel)]="uuidToReturn" />
+            <label for="txtCuiLend">Uuid</label>
+            <small class="p-invalid" *ngIf="submitted && !uuidToReturn && !uuidToReturn.trim()?.length">El Uuid
+              es obligatorio</small>
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()">
+      </button>
+      <button pButton pRipple label="Regresar" icon="pi pi-check" class="p-button-text" (click)="returnBook()">
+      </button>
+    </ng-template>
+  </p-dialog>
+</div>
